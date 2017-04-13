@@ -5,7 +5,7 @@ import com.trilead.ssh2.auth.AuthenticationManager;
 import com.trilead.ssh2.channel.ChannelManager;
 import com.trilead.ssh2.crypto.CryptoWishList;
 import com.trilead.ssh2.crypto.cipher.BlockCipherFactory;
-import com.trilead.ssh2.crypto.digest.MAC;
+import com.trilead.ssh2.crypto.digest.MessageMac;
 import com.trilead.ssh2.log.Logger;
 import com.trilead.ssh2.packets.PacketIgnore;
 import com.trilead.ssh2.transport.ClientServerHello;
@@ -75,7 +75,7 @@ public class Connection
 	 */
 	public static synchronized String[] getAvailableMACs()
 	{
-		return MAC.getMacList();
+		return MessageMac.getMacs();
 	}
 
 	/**
@@ -1258,7 +1258,7 @@ public class Connection
 		if ((macs == null) || (macs.length == 0))
 			throw new IllegalArgumentException();
 		macs = removeDuplicates(macs);
-		MAC.checkMacList(macs);
+		MessageMac.checkMacs(macs);
 		cryptoWishList.c2s_mac_algos = macs;
 	}
 
@@ -1304,7 +1304,7 @@ public class Connection
 			throw new IllegalArgumentException();
 
 		macs = removeDuplicates(macs);
-		MAC.checkMacList(macs);
+		MessageMac.checkMacs(macs);
 		cryptoWishList.s2c_mac_algos = macs;
 	}
 
@@ -1315,8 +1315,7 @@ public class Connection
 	 * Unless you know what you are doing, you will never need this.
 	 * 
 	 * @param algos
-	 *            An array of allowed server host key algorithms. SSH-2 defines
-	 *            <code>ssh-dss</code> and <code>ssh-rsa</code>. The
+	 *            An array of allowed server host key algorithms. The
 	 *            entries of the array must be ordered after preference, i.e.,
 	 *            the entry at index 0 is the most preferred one. You must
 	 *            specify at least one entry.
